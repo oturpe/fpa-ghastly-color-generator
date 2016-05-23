@@ -8,6 +8,8 @@
 // the indicator is lit and darkened. Given in units of LOOP_DELAY.
 #define INDICATOR_HALF_PERIOD 4
 
+#define COLOR_PERIOD 2
+
 // Dmx settings
 #define DMX_PRESCALER Attiny45::PSV_256
 #define DMX_PORT PORTB
