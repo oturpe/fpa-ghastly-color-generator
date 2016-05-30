@@ -1,4 +1,10 @@
-// Fog mover tester
+// Ghastly color generator
+//
+// A dmx transmitter that produces dmx signal suitable for controlling a BeamZ
+// led Flatpar-186x10mm rgbw ir dmx light. Generates a color sequence that is
+// suitable for the "colorful appearing and disappearing ghost" effect.
+//
+// Author: Otto Urpelainen
 
 #include "Attiny45Utils.h"
 
@@ -43,9 +49,7 @@ ISR(INT0_vect,ISR_NOBLOCK) {
     magnetFound = !magnetFound;
 }
 
-
-
-
+// Temp: some color sequence
 #define COLOR_SEQUENCE_LENGTH 25
 uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][3] = {
     {0xff, 0x00, 0x00},
@@ -87,9 +91,6 @@ int main() {
     //    B0 (indicator)
     //    dmx output is set by library
     DDRB |= BV(DDB0);
-
-    // Enable external interrupt
-    //GIMSK |= BV(INT0);
 
     // Initialize dmx
     Attiny45::setTimer0Prescaler(DMX_PRESCALER);
