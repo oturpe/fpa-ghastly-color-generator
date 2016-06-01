@@ -50,39 +50,23 @@ ISR(INT0_vect,ISR_NOBLOCK) {
 }
 
 // Temp: some color sequence
-#define COLOR_SEQUENCE_LENGTH 25
-uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][3] = {
-    {0xff, 0x00, 0x00},
-    {0xf0, 0x00, 0x10},
-    {0xe0, 0x00, 0x20},
-    {0xd0, 0x00, 0x30},
-    {0xc0, 0x00, 0x40},
-    {0xb0, 0x00, 0x50},
-    {0xa0, 0x00, 0x60},
-    {0x90, 0x00, 0x70},
-    {0x80, 0x00, 0x80},
-    {0x70, 0x00, 0x90},
-    {0x60, 0x00, 0xa0},
-    {0x50, 0x00, 0xb0},
-    {0x40, 0x00, 0xc0},
-    {0x40, 0x00, 0xc0},
-    {0x50, 0x00, 0xb0},
-    {0x60, 0x00, 0xa0},
-    {0x70, 0x00, 0x90},
-    {0x80, 0x00, 0x80},
-    {0x90, 0x00, 0x70},
-    {0xa0, 0x00, 0x60},
-    {0xb0, 0x00, 0x50},
-    {0xc0, 0x00, 0x40},
-    {0xd0, 0x00, 0x30},
-    {0xe0, 0x00, 0x20},
-    {0xf0, 0x00, 0x10},
+#define COLOR_SEQUENCE_LENGTH 6
+uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][4] = {
+    {0xff, 0x00, 0x00, 50},
+    {0xff, 0x00, 0x00, 200},
+    {0x00, 0xff, 0x00, 50},
+    {0xff, 0x00, 0x00, 50},
+    {0xff, 0x00, 0x00, 200},
+    {0x00, 0x00, 0xff, 50}
 };
 
-void setColor(uint8_t * rbg) {
-    DmxSimple.write(2, rbg[0]);
-    DmxSimple.write(3, rbg[2]);
-    DmxSimple.write(4, rbg[1]);
+void setColor(uint8_t * current, uint8_t * next, uint8_t gradient) {
+    int16_t nextRed = current[0] + (next[0] - current[0])*gradient/next[3];
+    int16_t nextGreen = current[1] + (next[1] - current[1])*gradient/next[3];
+    int16_t nextBlue = current[2] + (next[2] - current[2])*gradient/next[3];
+    DmxSimple.write(2, nextRed);
+    DmxSimple.write(3, nextGreen);
+    DmxSimple.write(4, nextBlue);
 }
 
 int main() {
@@ -114,7 +98,8 @@ int main() {
 
     bool indicatorLit = false;
     uint64_t counter = 0;
-    uint16_t colorCounter = 0;
+    uint8_t colorSequenceCounter = 0;
+    uint8_t gradient = 1;
 
     while(true) {
         counter += 1;
@@ -126,8 +111,21 @@ int main() {
         }
 
         if(counter % COLOR_PERIOD == 0) {
-            setColor(colorSequence[colorCounter % COLOR_SEQUENCE_LENGTH]);
-            colorCounter++;
+            uint8_t currentPosition = colorSequenceCounter % COLOR_SEQUENCE_LENGTH;
+            uint8_t nextPosition = (colorSequenceCounter + 1) % COLOR_SEQUENCE_LENGTH;
+
+            uint8_t * current = colorSequence[currentPosition];
+            uint8_t * next = colorSequence[nextPosition];
+
+            setColor(current, next, gradient);
+
+            if (gradient == next[3]) {
+                colorSequenceCounter++;
+                gradient = 0;
+            }
+            else {
+                gradient++;
+            }
         }
     }
 }
