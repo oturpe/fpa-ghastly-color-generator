@@ -50,14 +50,22 @@ ISR(INT0_vect,ISR_NOBLOCK) {
 }
 
 // Temp: some color sequence
-#define COLOR_SEQUENCE_LENGTH 6
+#define COLOR_SEQUENCE_LENGTH 14
 uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][4] = {
-    {0xff, 0x00, 0x00, 50},
-    {0xff, 0x00, 0x00, 200},
-    {0x00, 0xff, 0x00, 50},
-    {0xff, 0x00, 0x00, 50},
-    {0xff, 0x00, 0x00, 200},
-    {0x00, 0x00, 0xff, 50}
+    {0xff, 0x00, 0x00, 60},
+    {0xff, 0x00, 0x00, 240},
+    {0x00, 0xff, 0x00, 60},
+    {0x30, 0xd0, 0x00, 10},
+    {0x00, 0xff, 0x00, 8},
+    {0x20, 0xe0, 0x00, 15},
+    {0x00, 0xff, 0x00, 10},
+    {0x40, 0xc0, 0x00, 8},
+    {0x00, 0xff, 0x00, 13},
+    {0x30, 0xd0, 0x00, 10},
+    {0x00, 0xff, 0x00, 7},
+    {0x00, 0xff, 0x00, 20},
+    {0xff, 0x00, 0x00, 60},
+    {0xff, 0x00, 0x00, 240}
 };
 
 void setColor(uint8_t * current, uint8_t * next, uint8_t gradient) {
@@ -81,20 +89,19 @@ int main() {
     DmxSimple.maxChannel(DMX_CHANNELS);
     sei();
 
-    // Set color balance: all full off initially
-    DmxSimple.write(2, 0x00);
-    DmxSimple.write(3, 0x00);
-    DmxSimple.write(4, 0x00);
+    // White is not used
     DmxSimple.write(5, 0x00);
-
     // Master brightness full always
     DmxSimple.write(1, 0xff);
-
     // Set auto/sound mode and stroboscope off
     DmxSimple.write(6, 0x00);
     DmxSimple.write(7, 0x00);
 
-    _delay_ms(500);
+    // Set initial color
+    uint8_t initialColor[3] = {INITIAL_RED, INITIAL_GREEN, INITIAL_BLUE};
+    setColor(initialColor, initialColor, 0);
+
+    _delay_ms(INITIAL_DELAY);
 
     bool indicatorLit = false;
     uint64_t counter = 0;
