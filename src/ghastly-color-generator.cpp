@@ -1,8 +1,12 @@
 // Ghastly color generator
 //
 // A dmx transmitter that produces dmx signal suitable for controlling a BeamZ
-// led Flatpar-186x10mm rgbw ir dmx light. Generates a color sequence that is
-// suitable for the "colorful appearing and disappearing ghost" effect.
+// led Flatpar-186x10mm rgbw ir dmx light. Generates random flashes that look
+// great projected through a ḿodified fan.
+
+// Also fenerates a color sequence that is suitable for Cameio Flat Pro Outdoor
+// Par Can in 3 channel mode 2. Generates a color sequence that is suitable for
+// the "colorful appearing and disappearing ghost" effect.
 //
 // Author: Otto Urpelainen
 
@@ -29,7 +33,6 @@ inline void setIndicator(bool lit) {
         PORTB &= ~BV(PORTB0);
     }
 }
-
 
 bool magnetFound = false;
 
@@ -68,13 +71,25 @@ uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][4] = {
     {0xff, 0x00, 0x00, 240}
 };
 
+/// \brief
+///    Sets color of the ghastly colorful apparition light.
+///
+/// \param current
+///    The current color in color sequence
+///
+/// \param next
+///    Next color in the color sequence
+///
+/// \param gradient
+///    Gradient position
 void setColor(uint8_t * current, uint8_t * next, uint8_t gradient) {
+    // Note: Green and blue inverted due to malfunctioning (?) dmx light.
     int16_t nextRed = current[0] + (next[0] - current[0])*gradient/next[3];
     int16_t nextGreen = current[1] + (next[1] - current[1])*gradient/next[3];
     int16_t nextBlue = current[2] + (next[2] - current[2])*gradient/next[3];
-    DmxSimple.write(2, nextRed);
-    DmxSimple.write(3, nextGreen);
-    DmxSimple.write(4, nextBlue);
+    DmxSimple.write(DMX_COLORFUL_CHANNEL, nextRed);
+    DmxSimple.write(DMX_COLORFUL_CHANNEL + 2, nextGreen);
+    DmxSimple.write(DMX_COLORFUL_CHANNEL + 1, nextBlue);
 }
 
 int main() {
@@ -90,12 +105,12 @@ int main() {
     sei();
 
     // White is not used
-    DmxSimple.write(5, 0x00);
+    DmxSimple.write(DMX_FAN_CHANNEL+4, 0x00);
     // Master brightness full always
-    DmxSimple.write(1, 0xff);
+    DmxSimple.write(DMX_FAN_CHANNEL, 0xff);
     // Set auto/sound mode and stroboscope off
-    DmxSimple.write(6, 0x00);
-    DmxSimple.write(7, 0x00);
+    DmxSimple.write(DMX_FAN_CHANNEL+5, 0x00);
+    DmxSimple.write(DMX_FAN_CHANNEL+6, 0x00);
 
     // Set initial color
     uint8_t initialColor[3] = {INITIAL_RED, INITIAL_GREEN, INITIAL_BLUE};
