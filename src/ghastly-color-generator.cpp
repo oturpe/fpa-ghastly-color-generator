@@ -83,13 +83,12 @@ uint8_t colorSequence[COLOR_SEQUENCE_LENGTH][4] = {
 /// \param gradient
 ///    Gradient position
 void setColor(uint8_t * current, uint8_t * next, uint8_t gradient) {
-    // Note: Green and blue inverted due to malfunctioning (?) dmx light.
     int16_t nextRed = current[0] + (next[0] - current[0])*gradient/next[3];
     int16_t nextGreen = current[1] + (next[1] - current[1])*gradient/next[3];
     int16_t nextBlue = current[2] + (next[2] - current[2])*gradient/next[3];
     DmxSimple.write(DMX_COLORFUL_CHANNEL, nextRed);
-    DmxSimple.write(DMX_COLORFUL_CHANNEL + 2, nextGreen);
-    DmxSimple.write(DMX_COLORFUL_CHANNEL + 1, nextBlue);
+    DmxSimple.write(DMX_COLORFUL_CHANNEL + 1, nextGreen);
+    DmxSimple.write(DMX_COLORFUL_CHANNEL + 2, nextBlue);
 }
 
 int main() {
