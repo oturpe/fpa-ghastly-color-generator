@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name ghastly-color-generator-rescue)(type Legacy)(uri ${KIPRJMOD}/ghastly-color-generator-rescue.lib)(options "")(descr ""))
+)
